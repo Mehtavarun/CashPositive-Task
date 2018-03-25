@@ -21,7 +21,8 @@ or (based on your choice of working)
 ```
 nodemon app
 ```
-
+### POSTMAN API Documentation
+[API Documentation](https://documenter.getpostman.com/view/4001515/task/RVtvqYrB)
 ### Built With
 This was built using [Body-Parser](https://github.com/expressjs/body-parser) [Cookie-Parser](https://github.com/expressjs/cookie-parser) [MongoDB](https://github.com/mongodb/mongo)
 
