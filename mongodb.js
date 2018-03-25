@@ -9,17 +9,6 @@ mongo.connect(url,(err,db)=>{
 
 	db.collection('samarasubs').findAndModify(
 		
-		// {"Name":"john"}, 
-		
-		// {
-		// 	"$addToSet":{
-		// 		"hobbies":{
-		// 			"fromuser":"me",
-		// 	 		"msg":"sdlfkasnfdln"
-		// 	 		}
-		// 	 	}
-		// 	},
-		// 	{new: true, upsert: true}
 		{"Name":"john"},
     [['_id','asc']],
     { "$addToSet": { "hobbies":{

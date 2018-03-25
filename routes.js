@@ -5,7 +5,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 //authenticate user for login --------------------------------
 
-	app.post('/login',(req,res)=>{
+	app.post('/api/login',(req,res)=>{
 
 		mongo.connect(url, (err,db)=>{
 			if(err) throw err;
@@ -24,6 +24,8 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 					req.session.password = req.body.password;
 					//redirect to dashboard or wherever according to your choice
 
+
+					res.json(req.session.username);
 				}
 			})
 		})
@@ -34,7 +36,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 	//sending message to user --------------------------------
 
-	app.post('/sendmessage',(req,res)=>{
+	app.post('/api/sendmessage',(req,res)=>{
 		
 		if(!req.session.username){
 			
@@ -47,7 +49,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 				db.collection('CashPositive').findOne({Username:req.body.toUser}, (err,result)=>{
 
-					if(result.blockedUser[req.body.toUser]===true){
+					if(result.blockedUser.indexOf(req.body.toUser)===-1){
 						
 						res.send(`<h3>Sorry, You cannot message ${req.body.toUser}</h3>`);
 
@@ -75,6 +77,8 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 							
 							,(err,result)=>{
 								if(err) throw err;
+
+								res.json(req.body.msgContent);
 							}
 						);
 
@@ -108,15 +112,13 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 			});
 		}
-	}
-
-	});
+	})
 
 
 
 	//registering new user to app --------------------------------
 
-	app.post('/register',(req,res)=>{
+	app.post('/api/register',(req,res)=>{
 
 		mongo.connect(url, (err,db)=>{
 			if(err) {
@@ -128,7 +130,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 				if(err){
 				 	throw err;
 				}
-
+				console.log(req.body.username)
 				if(result.length>0){
 						
 						res.send('<h2>User already exists with username.</h2>');
@@ -149,7 +151,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 						fromUserMsg:[],
 						blockedUser:[]
 
-						//these array being empty or not will get checked on front end only 
+						//these fields being empty or not will get checked on front end only 
 						//for special symbols or invalid data on fields shall also be checked on front end
 
 					},(err,result)=>{
@@ -161,7 +163,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 							l_name: req.body.last,
 							username: req.body.username
 						}
-						res.json(user);
+						res.send(req.body.username);
 
 						//user will be redirected to his profile or dashboard 
 						//based on implementation of website 
@@ -177,7 +179,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 	//checking out all messages recieved --------------------------------
 
-	app.get('/inbox',(req,res)=>{
+	app.get('/api/inbox',(req,res)=>{
 
 		if(!req.session.username){
 			res.send("<h1>Please Login first to see messages</h1>");
@@ -186,14 +188,15 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 			mongo.connect(url, (err,db)=>{
 			if(err) throw err;
 
-			db.collection('CashPositive').find({username: req.session.username}).toArray((err,result)=>{
+			db.collection('CashPositive').findOne({Username: req.session.username}, (err,result)=>{
 				
 					if(err) throw err;
 
-					if(result.length<0){
+					if(result.length===0){
 						res.send("<h3>No messages to show.</h3>");
 					} else {
-						res.json(result.fromUserMsg);
+						console.log(result.fromUserMsg);
+						res.send(result.fromUserMsg);
 					}
 				}
 			);
@@ -204,7 +207,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 	//blocking user to send message --------------------------------
 
-	app.put('/block/:username',(req,res)=>{
+	app.put('/api/block/:username',(req,res)=>{
 		
 		if(!req.session.username){
 			res.send("<h2>Please Login first</h2>");
@@ -222,7 +225,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 				    		"blockedUser":
 				    			
 				    			//blockUser is username of user to be blocked
-				    			req.params.username:true
+				    			req.params.username
 						}
 					},
 				    {
@@ -232,6 +235,8 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 					
 					,(err,result)=>{
 						if(err) throw err;
+
+						res.send(req.params.username);
 					}
 				);
 		});
@@ -241,5 +246,4 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 	});
 
-app.listen(6500);
 }

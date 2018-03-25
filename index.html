@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Task CashPositive</title>
+</head>
+<body><br/>
+	<h2>New User</h2>
+	<form method="POST" action='http://localhost:6500/register'>
+		First Name:<input type="text" name="first" placeholder="First Name" /><br/>
+		Last Name:<input type="text" name="last" placeholder="Last Name" /><br/>
+		Username:<input type="text" name="username" placeholder="Username" /></br>
+		Password:<input type="Password" name="password" placeholder="Password" /><br/><br/>
+		<button type="submit">Create Account</button>
+	</form><br/>
+<br/>
+	<h2>Login</h2>
+	<form method="POST" action='http://localhost:6500/login'>
+		Username:<input type="text" name="username1" placeholder="Username" /></br>
+		Password:<input type="Password" name="password1" placeholder="Password" /><br/><br/>
+		<button type="submit">Login</button>
+	</form>
+<br/><br/>
+	<h2>Send Message</h2>
+	<form method="POST" action='http://localhost:6500/sendmessage'>
+		<input type="text" name="toUser" placeholder="Username">
+		<input type="text" name="msgSubject">
+		<textarea name="msgContent" width="150" height="100"></textarea>
+		<button type="submit">Send</button>
+	</form>
+<br/>
+<br/>
+	<h2>Block</h2>
+	<form method="PUT" action='http://localhost:6500/block/'>
+		<button type="submit">Send</button>
+	</form>
+</body>
+</html>
