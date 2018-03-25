@@ -25,7 +25,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 					//redirect to dashboard or wherever according to your choice
 
 
-					res.json(req.session.username);
+					res.send('Successfully Logged In');
 				}
 			})
 		})
@@ -49,7 +49,9 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 
 				db.collection('CashPositive').findOne({Username:req.body.toUser}, (err,result)=>{
 
-					if(result.blockedUser.indexOf(req.body.toUser)===-1){
+
+					//checking array in db to see if user is blocked or not
+					if(result.blockedUser.indexOf(req.body.toUser)!=-1){
 						
 						res.send(`<h3>Sorry, You cannot message ${req.body.toUser}</h3>`);
 
@@ -163,7 +165,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 							l_name: req.body.last,
 							username: req.body.username
 						}
-						res.send(req.body.username);
+						res.send('New User Created');
 
 						//user will be redirected to his profile or dashboard 
 						//based on implementation of website 
@@ -195,7 +197,8 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 					if(result.length===0){
 						res.send("<h3>No messages to show.</h3>");
 					} else {
-						console.log(result.fromUserMsg);
+
+						//finding messages in databases to be sent to front end
 						res.send(result.fromUserMsg);
 					}
 				}
@@ -236,14 +239,11 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 					,(err,result)=>{
 						if(err) throw err;
 
-						res.send(req.params.username);
+						res.send('User Blocked');
 					}
 				);
 		});
 		}
-
-		console.log(req.params.username);
-
 	});
 
 }
