@@ -45,59 +45,67 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 				if(err) throw err;
 
 
-				//Adding message information to sender's collection
+				db.collection('CashPositive').findOne({Username:req.body.toUser}, (err,result)=>{
 
-				db.collection('CashPositive').findAndModify(
-			
-					{"Username":req.session.username},
-				    [['_id','asc']],
-				    { 
-				    	"$addToSet": { 
-				    		"toUserMsg":{ 
-				    			"recpUser":req.body.recpUser,
-						    	"subject":req.body.msgSubject,
-						    	"content":req.body.msgContent
+					if(result.blockedUser[req.body.toUser]===true){
+						
+						res.send(`<h3>Sorry, You cannot message ${req.body.toUser}</h3>`);
+
+					} else {
+
+						//Adding message information to sender's collection
+
+						db.collection('CashPositive').findAndModify(
+					
+							{"Username":req.session.username},
+						    [['_id','asc']],
+						    { 
+						    	"$addToSet": { 
+						    		"toUserMsg":{ 
+						    			"toUser":req.body.toUser,
+								    	"subject":req.body.msgSubject,
+								    	"content":req.body.msgContent
+									}
+								}
+							},
+						    {
+						    	new: true, 
+						    	upsert: true
+						    }
+							
+							,(err,result)=>{
+								if(err) throw err;
 							}
-						}
-					},
-				    {
-				    	new: true, 
-				    	upsert: true
-				    }
+						);
+
+						//Adding message information to receiver's collection
+
+						db.collection('CashPositive').findAndModify(
 					
-					,(err,result)=>{
-						if(err) throw err;
-					}
-				);
-
-				//Adding message information to receiver's collection
-
-				db.collection('CashPositive').findAndModify(
-			
-
-					//condition to check if user is blocked
-
-					
-					{"Username":req.body.toUser},
-				    [['_id','asc']],
-				    { 
-				    	"$addToSet": { 
-				    		"fromUserMsg":{ 
-				    			"fromUser":req.session.username,
-						    	"subject":req.body.msgSubject,
-						    	"content":req.body.msgContent
+							{"Username":req.body.toUser},
+						    [['_id','asc']],
+						    { 
+						    	"$addToSet": { 
+						    		"fromUserMsg":{ 
+						    			"fromUser":req.session.username,
+								    	"subject":req.body.msgSubject,
+								    	"content":req.body.msgContent
+									}
+								}
+							},
+						    {
+						    	new: true, 
+						    	upsert: true
+						    }
+							
+							,(err,result)=>{
+								if(err) throw err;
 							}
-						}
-					},
-				    {
-				    	new: true, 
-				    	upsert: true
-				    }
-					
-					,(err,result)=>{
-						if(err) throw err;
+						);
 					}
-				);
+				});
+
+
 			});
 		}
 	}
@@ -214,7 +222,7 @@ module.exports = (app, urlencodedParser, mongo, session, url)=>{
 				    		"blockedUser":
 				    			
 				    			//blockUser is username of user to be blocked
-				    			req.body.blockUser:true
+				    			req.params.username:true
 						}
 					},
 				    {
