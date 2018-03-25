@@ -7,10 +7,28 @@ mongo.connect(url,(err,db)=>{
 
 	if(err) throw err;
 
-	db.collection('samarasubs').insertOn({Name:"john", hobbies:[]},(err,result)=>{
+	db.collection('samarasubs').findAndModify(
+		
+		// {"Name":"john"}, 
+		
+		// {
+		// 	"$addToSet":{
+		// 		"hobbies":{
+		// 			"fromuser":"me",
+		// 	 		"msg":"sdlfkasnfdln"
+		// 	 		}
+		// 	 	}
+		// 	},
+		// 	{new: true, upsert: true}
+		{"Name":"john"},
+    [['_id','asc']],
+    { "$addToSet": { "hobbies":{
+    	"msg":"ldfjldflkkladflk",
+    	"touser":"lakjdffljalfkjlkdfjlsjflfljladsjflajkdfljkasldsfjk"
+    }} },
+    {new: true, upsert: true}
+		,(err,result)=>{
 		if(err) throw err;
-
-		console.log(result);
 	})
 
 })
